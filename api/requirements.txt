@@ -1,0 +1,8 @@
+tensorflow
+flask
+flask_cors
+pillow
+lxml
+gunicorn
+matplotlib
+pymongo

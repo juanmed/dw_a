@@ -1,0 +1,24 @@
+item {
+    id: 1
+    name: 'word'
+}
+
+item {
+    id: 2
+    name: 'char'
+}
+
+item {
+    id: 3
+    name: 'package'
+}
+
+item {
+    id: 4
+    name: 'logo'
+}
+
+item {
+    id: 5
+    name: 'title'
+}
