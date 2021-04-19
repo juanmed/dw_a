@@ -8,6 +8,7 @@ import numpy as np
 import cv2
 import werkzeug
 app = Flask(__name__) 
+app.config['JSON_AS_ASCII'] = False
 
 
 APP_ROOT = os.getenv('APP_ROOT', '/infer')  
@@ -29,7 +30,7 @@ def handle_request():
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     out = u_net.infer(img) 
 
-    return out
+    return jsonify(out)
 
 
 @app.route(APP_ROOT, methods=["POST"]) 

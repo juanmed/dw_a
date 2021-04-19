@@ -79,8 +79,8 @@ class Inferer:
         print('Done! Took {} seconds'.format(elapsed_time))
         #self.predict = self.model.signatures["serving_default"]
         self.image_size = 3024
-        self.drugs_list = ['그날엔노즈플러스','그란엔노즈','그린노즈에스','래피노즈','래피콜','래피콜노즈','레피콜','베아제','소하자임','속시판','속코','시노카엔','시노타딘','시로제노','쎄르텍','씨콜드','알러샷','알러엔','알러지성 바염 코감기','알러지성 비염 코감기','알러지성 비염 코기','알리지성 비염 코감기','알지싹로라','오로친','우라사','이지엔5이브','이지엔6','이지엔6애니','이지엔6에이스','이지엔6이브','이지엔6프로','이지엔6프로이지엔6프로','지르텍','코드랍','코란투에스','코린투에스','코메키나','코미','코스펜','코졸텍','큐자임','클라리틴','클라리틴정','프노즈','프리노즈']
-        self.threshold = 0.25
+        self.drugs_list = ['그린노즈에스','래피노즈','래피콜노즈','레피콜','베아제','소하자임','속시판','속코','시노카엔','시노타딘','시로제노','쎄르텍','씨콜드','알러샷','알러엔','알러지성 비염 코감기','알지싹로라','오로친','우라사','이지엔6이브','이지엔6애니','이지엔6에이스','이지엔6프로','지르텍','코드랍','코린투에스','코메키나','코미','코스펜','코졸텍','큐자임','클라리틴','프리노즈']
+        self.threshold = 0.5
 
     def preprocess(self, image): 
         #image = tf.image.resize(image, (self.image_size, self.image_size)) 
@@ -135,7 +135,7 @@ class Inferer:
         print("Result")
         print(dets)
 
-        return json.dumps(dets)
+        return dets#json.dumps(dets, ensure_ascii=False).encode('utf8')
 
 if __name__ == '__main__':
 
