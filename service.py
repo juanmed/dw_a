@@ -30,7 +30,17 @@ def handle_request():
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     out = u_net.infer(img) 
 
-    return jsonify(out)
+    t = []
+    s = ""
+    for key in out.keys():
+        s = s + "OCR Result: "
+        s = s + key + "\n"
+        s = s + " Possible drugs: "
+        for v in out[key]:
+            s = s + v + ", "
+        s = s + "\n"
+
+    return s#jsonify(out)
 
 
 @app.route(APP_ROOT, methods=["POST"]) 
