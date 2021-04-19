@@ -22,11 +22,14 @@ if not os.path.exists(output_path):
   pl.Path(output_path).mkdir(parents=True, exist_ok=True)
 
 def infer(): 
-    image =np.asarray(Image.open(image_path)).astype(np.float32) 
-    data = { 'image': image.tolist() } 
+    image =np.asarray(Image.open(image_path)).astype(np.float32)
+    h,w = image.shape[0:2] 
+    print("Shape: ",image.shape)
+    data = { 'image': image.tolist(), 'width':w, 'height': h} 
     response = requests.post(ENDPOINT_URL, json = data) 
     response.raise_for_status() 
     print(response.content)
+    """
     if response.ok:
 
         # get response values
@@ -66,5 +69,6 @@ def infer():
         
     else:
         print("Problem with response from server.")
+    """
 if __name__ =="__main__": 
     infer() 

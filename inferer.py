@@ -18,6 +18,7 @@ import numpy as np
 
 from difflib import SequenceMatcher
 import easyocr
+import json
 
 images_path = "./images"
 model_path = "./model"
@@ -78,9 +79,11 @@ class Inferer:
         print('Done! Took {} seconds'.format(elapsed_time))
         #self.predict = self.model.signatures["serving_default"]
         self.image_size = 3024
+        self.drugs_list = ['그날엔노즈플러스','그란엔노즈','그린노즈에스','래피노즈','래피콜','래피콜노즈','레피콜','베아제','소하자임','속시판','속코','시노카엔','시노타딘','시로제노','쎄르텍','씨콜드','알러샷','알러엔','알러지성 바염 코감기','알러지성 비염 코감기','알러지성 비염 코기','알리지성 비염 코감기','알지싹로라','오로친','우라사','이지엔5이브','이지엔6','이지엔6애니','이지엔6에이스','이지엔6이브','이지엔6프로','이지엔6프로이지엔6프로','지르텍','코드랍','코란투에스','코린투에스','코메키나','코미','코스펜','코졸텍','큐자임','클라리틴','클라리틴정','프노즈','프리노즈']
+        self.threshold = 0.25
 
     def preprocess(self, image): 
-        image = tf.image.resize(image, (self.image_size, self.image_size)) 
+        #image = tf.image.resize(image, (self.image_size, self.image_size)) 
         return tf.cast(image, tf.uint8) #/ 255.0 
 
     def infer(self, image=None): 
@@ -100,29 +103,39 @@ class Inferer:
         detections['detection_classes'] = detections['detection_classes'].astype(np.int64)
         
 
-        dets = "Dets: "
+        dets = {}
         for i,(box,cl,score) in enumerate(zip(detections['detection_boxes'],detections['detection_classes'],detections['detection_scores'])):
             if score > 0.3:
                 if cl == 5: #is title
                     title_crop = get_image_crop(image_np_with_detections,box[1],box[0],box[3],box[2], 16, 16)
+                    print("TITLE CROP: ",title_crop.shape)
+
                     #gtlabel = gt_labels[gt_labels['files']==image_path]['names'].tolist()[0]
 
                     if title_crop.shape[0] > title_crop.shape[1]:
                         title_crop=cv2.rotate(title_crop, cv2.ROTATE_90_CLOCKWISE)            
 
-                    #dim = (380,160)
-                    #title_crop = cv2.resize(title_crop, dim, interpolation = cv2.INTER_AREA)
+                    dim = (380,160)
+                    title_crop = cv2.resize(title_crop, dim, interpolation = cv2.INTER_AREA)
 
                     for i in range(2):
                         reader = easyocr.Reader(['ko','en'], gpu=True) # need to run only once to load model into memory
                         result = reader.readtext(title_crop)
                         for detection in result:
                             points, text, score = detection
-                            dets = dets + " / " + text
-                            #score = compare_strings(gtlabel,text)
+                            for drug in self.drugs_list:
+                                score = compare_strings(drug,text)
+                                if score >= self.threshold:
+                                    try:
+                                        dets[text].append(drug)
+                                    except:
+                                        dets[text] = [drug]
                         title_crop=cv2.flip(title_crop, -1)
 
-        return dets
+        print("Result")
+        print(dets)
+
+        return json.dumps(dets)
 
 if __name__ == '__main__':
 

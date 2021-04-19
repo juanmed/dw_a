@@ -32,19 +32,20 @@ def handle_request():
     return out
 
 
-#@app.route(APP_ROOT, methods=["POST"]) 
+@app.route(APP_ROOT, methods=["POST"]) 
 def infer(): 
     data = request.get_json() 
-    image = data['image'] 
+    image = np.array(data['image']).reshape(data['height'], data['width'],-1).astype(np.uint8) 
+    print("===== TYPE: ",type(image), image.shape)
     out = u_net.infer(image) 
     print("OUTPUT: \n {}".format(out))
-    for key in out.keys():
-        b = out[key]
-        print("{} is {}".format(key,type(out[key])))
-        if type(b) == np.ndarray:
-            print(b.shape)
-            out[key] = b.tolist()
-    return jsonify(out)
+    #for key in out.keys():
+    #    b = out[key]
+    #    print("{} is {}".format(key,type(out[key])))
+    #    if type(b) == np.ndarray:
+    #        print(b.shape)
+    #        out[key] = b.tolist()
+    return out#jsonify(out)
 
 @app.errorhandler(Exception) 
 def handle_exception(e): 
