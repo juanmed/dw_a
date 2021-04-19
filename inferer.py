@@ -16,6 +16,9 @@ else:
     import zipfile36 as zipfile
 import numpy as np
 
+from difflib import SequenceMatcher
+import easyocr
+
 images_path = "./images"
 model_path = "./model"
 
@@ -50,6 +53,17 @@ for gpu in gpus:
 #labelmap_url = "https://raw.githubusercontent.com/juanmed/dw_a/main/dll_package_recognition/label_map.pbtxt"
 #labelmap_file = wget.download(labelmap_url)
 
+def get_image_crop(image, xmin_n, ymin_n, xmax_n, ymax_n, margin_x=0, margin_y=0):
+  h,w,d = image.shape
+  xmin = int(xmin_n * w)
+  ymin = int(ymin_n * h)
+  xmax = int(xmax_n * w)
+  ymax = int(ymax_n * h)
+  return image[ymin - margin_y: ymax + margin_y, xmin - margin_x: xmax + margin_x]
+
+def compare_strings(a,b):
+  return SequenceMatcher(None, a, b).ratio()
+
 class Inferer:
 
     def __init__(self):
@@ -71,6 +85,7 @@ class Inferer:
 
     def infer(self, image=None): 
         print(" *** INICIANDO PROCESO ***")
+        image_np_with_detections = image.copy()
         tensor_image = tf.convert_to_tensor(image, dtype=tf.float32) 
         tensor_image = self.preprocess(tensor_image) 
         shape = tensor_image.shape 
@@ -83,10 +98,31 @@ class Inferer:
                        for key, value in detections.items()}
         detections['num_detections'] = num_detections 
         detections['detection_classes'] = detections['detection_classes'].astype(np.int64)
+        
 
-        image_np_with_detections = image.copy()
+        dets = "Dets: "
+        for i,(box,cl,score) in enumerate(zip(detections['detection_boxes'],detections['detection_classes'],detections['detection_scores'])):
+            if score > 0.3:
+                if cl == 5: #is title
+                    title_crop = get_image_crop(image_np_with_detections,box[1],box[0],box[3],box[2], 16, 16)
+                    #gtlabel = gt_labels[gt_labels['files']==image_path]['names'].tolist()[0]
 
-        return detections
+                    if title_crop.shape[0] > title_crop.shape[1]:
+                        title_crop=cv2.rotate(title_crop, cv2.ROTATE_90_CLOCKWISE)            
+
+                    #dim = (380,160)
+                    #title_crop = cv2.resize(title_crop, dim, interpolation = cv2.INTER_AREA)
+
+                    for i in range(2):
+                        reader = easyocr.Reader(['ko','en'], gpu=True) # need to run only once to load model into memory
+                        result = reader.readtext(title_crop)
+                        for detection in result:
+                            points, text, score = detection
+                            dets = dets + " / " + text
+                            #score = compare_strings(gtlabel,text)
+                        title_crop=cv2.flip(title_crop, -1)
+
+        return dets
 
 if __name__ == '__main__':
 

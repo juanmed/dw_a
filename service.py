@@ -29,7 +29,7 @@ def handle_request():
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     out = u_net.infer(img) 
 
-    return "EXITO PAPA"
+    return out
 
 
 #@app.route(APP_ROOT, methods=["POST"]) 
