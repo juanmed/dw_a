@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 category_index = label_map_util.create_category_index_from_labelmap('label_map.pbtxt',
                                                                     use_display_name=True)
 
-ENDPOINT_URL = "http://0.0.0.0:8080/infer" 
+ENDPOINT_URL = "http://0.0.0.0:5000/infer" 
  
-image_path = './pkrecog_031_0006.jpg'
+image_path = './dll_package_recognition/pkrecog_031_0006.jpg'
 
 output_path = "./sample_output"
 
@@ -26,6 +26,7 @@ def infer():
     data = { 'image': image.tolist() } 
     response = requests.post(ENDPOINT_URL, json = data) 
     response.raise_for_status() 
+    print(response.content)
     if response.ok:
 
         # get response values

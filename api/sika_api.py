@@ -24,7 +24,7 @@ from pymongo import MongoClient
 import datetime
 
 frozen_model_filename="/home/fer/repos/sikatrain/model/graph/frozen_inference_graph.pb"#os.environ['FROZEN_MODEL'] # Path to frozen model
-label_map_path="/home/fer/repos/dw_a/label_map.pbtxt"#os.environ['LABEL_MAP'] # Path to label map
+label_map_path="../label_map.pbtxt"#os.environ['LABEL_MAP'] # Path to label map
 num_labels=6 # Number of labels
 gpu_memory=.5 # GPU memory per process
 

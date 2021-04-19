@@ -17,7 +17,7 @@ else:
 import numpy as np
 
 images_path = "./images"
-model_path = "../model"
+model_path = "./model"
 
 if not os.path.exists(images_path):
   pl.Path(images_path).mkdir(parents=True, exist_ok=True)
@@ -90,7 +90,7 @@ class Inferer:
 
 if __name__ == '__main__':
 
-    img = cv2.imread("./pkrecog_001_0001.jpg")
+    img = cv2.imread("./dll_package_recognition/pkrecog_031_0006.jpg")
     predictor = Inferer()
     output = predictor.infer(img)
     print(output)
